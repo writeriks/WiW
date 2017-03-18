@@ -142,6 +142,15 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     self.present(arViewController, animated: true, completion: nil)
   }
   
+  @IBAction func refreshAction(_ sender: Any) {
+    self.startedLoadingPOIs = false
+    let allAnnotations = self.mapView.annotations
+    self.mapView.removeAnnotations(allAnnotations)
+    locationManager.startUpdatingLocation()
+    locationManager.requestWhenInUseAuthorization()
+    self.view.endEditing(true)
+  }
+    
   func showInfoView(forPlace place:Place){
     let alert = UIAlertController(title: place.placeName , message: place.infoText, preferredStyle: UIAlertControllerStyle.alert)
     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
