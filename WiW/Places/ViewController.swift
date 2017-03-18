@@ -5,6 +5,8 @@ import MapKit
 import CoreLocation
 
 var catName=""
+
+// MARK: Location Manager extension Method
 extension ViewController: CLLocationManagerDelegate{
   func locationManager(_ manager:CLLocationManager, didUpdateLocations locations:[CLLocation]){
     if  places.count != 0{
@@ -56,6 +58,8 @@ extension ViewController: CLLocationManagerDelegate{
                 
                 
                 DispatchQueue.main.async {//execute in main thread
+                  let detailButton: UIButton = UIButton(type:UIButtonType.detailDisclosure) as UIButton
+                  self.annotationView.rightCalloutAccessoryView = detailButton
                   self.mapView.addAnnotation(annotation)
                 }
               }
@@ -67,7 +71,7 @@ extension ViewController: CLLocationManagerDelegate{
     }
   }
 }
-// AnnotationView datasource and delegate
+// MARK: AnnotationView datasource and delegate
 extension ViewController: ARDataSource {
   func ar(_ arViewController: ARViewController, viewForAnnotation: ARAnnotation) -> ARAnnotationView {
     let annotationView = AnnotationView()
@@ -85,7 +89,6 @@ extension ViewController: AnnotationViewDelegate {
     if let annotation = annotationView.annotation as? Place{
       let placesLoader = PlacesLoader()
       placesLoader.loadDetailInformation(forPlace: annotation){resultDict, error in
-      
         if let infoDict = resultDict?.object(forKey: "result") as? NSDictionary{
           annotation.phoneNumber = infoDict.object(forKey: "formatted_phone_number") as? String
           annotation.website = infoDict.object(forKey: "website") as? String
@@ -98,12 +101,17 @@ extension ViewController: AnnotationViewDelegate {
   }
 }
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate{
+
+// MARK:  View Controller
+class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate,MKMapViewDelegate{
   
     
   @IBOutlet var categoryPickerTextField: UITextField!
   var pickOption = ["airport", "amusement_park", "art_gallery","atm","bank","bar","cafe","casino","church","city_hall","embassy","establishment","gym","hospital","library","mosque","museum","park","pharmacy","police","post_office","restaurant","shopping_mall","stadium","synagogue","university","veterinary_care","zoo"]
   let pickerView = UIPickerView()
+  
+  let annotationView = MKAnnotationView()
+  let location = [CLLocation]()
   
   @IBOutlet weak var mapView: MKMapView!
   
@@ -115,6 +123,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    mapView.delegate = self
     
     pickerView.delegate = self
     categoryPickerTextField.inputView = pickerView
@@ -129,7 +138,21 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     super.didReceiveMemoryWarning()
     // Dispose of any resources that can be recreated.
   }
+  
 
+  //MARK: refresh Map Annotations
+  @IBAction func refreshAction(_ sender: Any) {
+    let overlays = mapView.overlays
+    mapView.removeOverlays(overlays)
+    self.startedLoadingPOIs = false
+    let allAnnotations = self.mapView.annotations
+    self.mapView.removeAnnotations(allAnnotations)
+    locationManager.startUpdatingLocation()
+    locationManager.requestWhenInUseAuthorization()
+    self.view.endEditing(true)
+  }
+  
+  //MARK : Open ARViewController
   @IBAction func showARController(_ sender: Any) {
     arViewController = ARViewController()
     arViewController.dataSource = self
@@ -142,15 +165,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     self.present(arViewController, animated: true, completion: nil)
   }
   
-  @IBAction func refreshAction(_ sender: Any) {
-    self.startedLoadingPOIs = false
-    let allAnnotations = self.mapView.annotations
-    self.mapView.removeAnnotations(allAnnotations)
-    locationManager.startUpdatingLocation()
-    locationManager.requestWhenInUseAuthorization()
-    self.view.endEditing(true)
-  }
-    
+  // MARK: ARView Annotation information
   func showInfoView(forPlace place:Place){
     let alert = UIAlertController(title: place.placeName , message: place.infoText, preferredStyle: UIAlertControllerStyle.alert)
     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
@@ -159,9 +174,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
   }
   
 
-  //-------------- PickerView Methods
-  
-  
+  // MARK: PickerView Methods
   func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
     return pickOption.count
   }
@@ -174,6 +187,8 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     return pickOption[row]
   }
   func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+    let overlays = mapView.overlays
+    mapView.removeOverlays(overlays)
     categoryPickerTextField.text = pickOption[row]
     self.startedLoadingPOIs = false
     let allAnnotations = self.mapView.annotations
@@ -182,5 +197,97 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     locationManager.requestWhenInUseAuthorization()
     self.view.endEditing(true)
   }
- }
+
+  // MARK: Annotation Button Added
+  func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+   
+    if annotation is MKUserLocation {
+      
+      return nil
+    }
+    
+    let reuseId = "pin"
+    var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+    
+    if pinView == nil {
+      pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+      pinView!.canShowCallout = true
+      pinView!.animatesDrop = true
+    }
+    
+    let button = UIButton(type:UIButtonType.detailDisclosure) as UIButton // button with info sign in it
+    
+    pinView?.rightCalloutAccessoryView = button
+    
+    
+    return pinView
+  }
+  
+  // MARK: annotation button tapped.
+  func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+    let overlays = mapView.overlays
+    mapView.removeOverlays(overlays)
+    
+    if control == view.rightCalloutAccessoryView{
+    
+    let lat = view.annotation?.coordinate.latitude
+    let long = view.annotation?.coordinate.longitude
+    
+    drawRoute(latitude: lat!,longitude: long!)
+
+    }
+  }
+  // MARK: Drawing the route
+  func drawRoute(latitude:CLLocationDegrees, longitude:CLLocationDegrees)->Void{
+    let currentLocation = CLLocationManager()
+    
+    let userLatitude = currentLocation.location?.coordinate.latitude
+    let userLongitude = currentLocation.location?.coordinate.longitude
+    
+    let sourceLocation = CLLocationCoordinate2D(latitude: userLatitude!, longitude: userLongitude!)
+    let destinationLocation = CLLocationCoordinate2D(latitude: (latitude), longitude:(longitude))
+    
+    let sourcePlacemark = MKPlacemark(coordinate: sourceLocation, addressDictionary: nil)
+    let destinationPlacemark = MKPlacemark(coordinate: destinationLocation, addressDictionary: nil)
+    
+    let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+    let destinationMapItem = MKMapItem(placemark: destinationPlacemark)
+    
+    let directionRequest = MKDirectionsRequest()
+    directionRequest.source = sourceMapItem
+    directionRequest.destination = destinationMapItem
+    directionRequest.transportType = .walking
+    
+    let directions = MKDirections(request: directionRequest)
+    
+    directions.calculate {
+      (response, error) -> Void in
+      
+      guard let response = response else {
+        if let error = error {
+          print("Error: \(error)")
+        }
+        
+        return
+      }
+      
+      let route = response.routes[0]
+      self.mapView.add((route.polyline), level: MKOverlayLevel.aboveRoads)
+      
+      let rect = route.polyline.boundingMapRect
+      self.mapView.setRegion(MKCoordinateRegionForMapRect(rect), animated: true)
+      
+    }
+  }
+  // MARK: draw the line
+  func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+    
+    let renderer = MKPolylineRenderer(overlay: overlay)
+    renderer.strokeColor = UIColor.green
+    renderer.lineWidth = 6.0
+    
+    return renderer
+  }
+  
+}
 
