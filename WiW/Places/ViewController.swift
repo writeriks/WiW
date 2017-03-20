@@ -215,12 +215,22 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
       pinView!.animatesDrop = true
     }
     
-    let button = UIButton(type:UIButtonType.detailDisclosure) as UIButton // button with info sign in it
+    //let button = UIButton(type:UIButtonType.detailDisclosure) as UIButton
     
-    pinView?.rightCalloutAccessoryView = button
-    
+    pinView?.rightCalloutAccessoryView = self.button()
+      //  pinView?.rightCalloutAccessoryView = button
     
     return pinView
+  }
+  //MARK: Navigation button Created with Image
+  func button() -> UIButton {
+    let image = UIImage(named:"navigationButton.png")
+    
+    let button = UIButton(type:UIButtonType.custom)
+    button.frame = CGRect(x: 0, y: 0, width: (image?.size.width)!, height: (image?.size.height)!)
+    button.setImage(image, for: .normal)
+    
+    return button
   }
   
   // MARK: annotation button tapped.

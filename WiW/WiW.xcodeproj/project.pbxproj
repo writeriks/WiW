@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5FC54A101E74404600E41634 /* AnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FC54A0F1E74404600E41634 /* AnnotationView.swift */; };
+		5FDC14CA1E8035E7002A25CA /* navigationButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 5FDC14C91E8035E7002A25CA /* navigationButton.png */; };
 		5FF6EEDC1E62277400BEA71E /* PlaceAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FF6EEDB1E62277400BEA71E /* PlaceAnnotation.swift */; };
 		8F7404471DCDD569009A6F0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7404461DCDD569009A6F0B /* AppDelegate.swift */; };
 		8F7404491DCDD569009A6F0B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F7404481DCDD569009A6F0B /* ViewController.swift */; };
@@ -30,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		5FC54A0F1E74404600E41634 /* AnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationView.swift; sourceTree = "<group>"; };
+		5FDC14C91E8035E7002A25CA /* navigationButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navigationButton.png; sourceTree = "<group>"; };
 		5FF6EEDB1E62277400BEA71E /* PlaceAnnotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaceAnnotation.swift; sourceTree = "<group>"; };
 		8F7404431DCDD569009A6F0B /* WiW.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WiW.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F7404461DCDD569009A6F0B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -63,6 +65,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5FDC14C21E802B39002A25CA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5FDC14C91E8035E7002A25CA /* navigationButton.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		8F74043A1DCDD569009A6F0B = {
 			isa = PBXGroup;
 			children = (
@@ -84,6 +94,7 @@
 		8F7404451DCDD569009A6F0B /* WiW */ = {
 			isa = PBXGroup;
 			children = (
+				5FDC14C21E802B39002A25CA /* Resources */,
 				8F7404461DCDD569009A6F0B /* AppDelegate.swift */,
 				8F7404481DCDD569009A6F0B /* ViewController.swift */,
 				5FC54A0F1E74404600E41634 /* AnnotationView.swift */,
@@ -202,6 +213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F7404511DCDD569009A6F0B /* LaunchScreen.storyboard in Resources */,
+				5FDC14CA1E8035E7002A25CA /* navigationButton.png in Resources */,
 				8F74046D1DCDD5F5009A6F0B /* hdar_close.png in Resources */,
 				8F74046F1DCDD5F5009A6F0B /* hdar_close@3x.png in Resources */,
 				8F74044E1DCDD569009A6F0B /* Assets.xcassets in Resources */,
